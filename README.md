@@ -1,2 +1,2 @@
-# tinytypescript
+# Tiny Typescript
 Tiny Typescript Compiler
