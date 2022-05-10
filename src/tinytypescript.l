@@ -9,6 +9,8 @@
    FILE *fp;
 %}
 
+%x CommentBlock
+
 %%
 "+" { return '+'; }
 "-" { return '-'; }
@@ -22,6 +24,7 @@
 "}" { return '}'; }
 "[" { return '['; }
 "]" { return ']'; }
+"^" { return '^'; }
 ";" { return ';'; }
 ":" { return ':'; }
 "," { return ','; }
@@ -41,6 +44,8 @@
 "*=" { return TK_MULT_EQUAL; }
 "/=" { return TK_DIV_EQUAL; }
 "%=" { return TK_MOD_EQUAL; }
+"^=" { return TK_PWR_EQUAL; }
+":=" { return TK_ASSIGN; }
 "++" { return TK_PLUS_PLUS; }
 "--" { return TK_MINUS_MINUS; }
 "import" { return KW_IMPORT; }
@@ -59,7 +64,7 @@
 "in" { return KW_IN; }
 "return" { return KW_RETURN; }
 "true" { return KW_TRUE; }
-"flase" { return KW_FALSE; }
+"false" { return KW_FALSE; }
 "var" { return KW_VAR; }
 "let" { return KW_LET; }
 "void" { return KW_VOID; }
@@ -70,6 +75,10 @@
 [0-9]+ { yylval.int_t = atoi(yytext); return TK_INTEGER; }
 [\t \r \n] { }
 . { printf("Invalid Lexical Character %c, Line No. %d\n", yytext[0], yylineno); }
+
+<CommentBlock>"*/" {BEGIN(INITIAL);}
+<CommentBlock>.|\n{  }
+<CommentBlock><<EOF>> { printf("Comentario de bloque no cerrado\n");}
 %%
 
 int yywrap(void) {
