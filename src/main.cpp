@@ -11,8 +11,10 @@ extern FILE *fp;
 DIR *dir;
 struct dirent *ent;
 
-int yyparse();
+//int yyparse();
+int yylex();
 void yyrestart(FILE *input_file);
+bool execute(const char* argument);
 
 int main (int argc, char *argv[]) {
     if (argc != 2) {
@@ -20,19 +22,27 @@ int main (int argc, char *argv[]) {
         return 1;
     }
 
-    bool yyin_flag = true;
-    const char *dir_path = argv[1];
-    char file_path[100];
-    sprintf(file_path, "%s", dir_path);
+    bool parse_successfully = execute(argv[1]);
+    if(!parse_successfully)
+        cout << "--COMPILED SUCCESSFULLY" << endl;
+    else
+        cout << "--COMPILED FAILED" << endl;
+    return 0;
+}
 
-    if((dir = opendir(dir_path)) != NULL) {
+bool execute(const char* directory) {
+    bool yyin_flag = true;
+    int parse_successfully = 0;
+    std::string dir_path = directory;
+    std::string file_path;
+
+    if((dir = opendir(dir_path.c_str())) != NULL) {
         while((ent = readdir(dir)) != NULL) {
-            if((strstr(ent->d_name, ".sql") != NULL)) {
-                memset(file_path, 0, sizeof(char*));
-                sprintf(file_path, "%s", dir_path);
-                sprintf(file_path, "%s", ent->d_name);
+            if((strstr(ent->d_name, ".ts") != NULL)) {
+                file_path.clear();
+                file_path = dir_path.append(ent->d_name);
                 
-                fp = fopen(file_path, "r");
+                fp = fopen(file_path.c_str(), "r");
                 if(fp == NULL) {
                     printf("File Error. Null.");
                     return 1;
@@ -43,14 +53,17 @@ int main (int argc, char *argv[]) {
                     yyin_flag = false;
                 }
 
-                yyparse();
+                /* parse_successfully = yyparse(); */
+                int token;
+                while ((token = yylex()) != 0) {
+                    cout << token << endl;
+                }
 
                 yyrestart(yyin);
                 fclose(fp);
             }
         }
         closedir(dir);
-    } 
-    cout << "\x1b[--COMPILED SUCCESSFULLY \x1b[0m" << endl;
-    return 0;
+    }
+    return parse_successfully;
 }

@@ -11,7 +11,7 @@
    void yyerror(const char*);
    extern int yyparse();
    extern int yylineno;
-   int yylex();
+   extern int yylex();
 %}
 
 %union {
