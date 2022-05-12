@@ -15,7 +15,7 @@
 "-" { printf("-"); return '-'; }
 "*" { printf("*"); return '*'; }
 "/" { printf("/"); return '/'; }
-"%" { printf("MOD"); return '%'; }
+"%" { printf("%c", '%'); return '%'; }
 "=" { printf("="); return '='; }
 "(" { printf("("); return '('; }
 ")" { printf(")"); return ')'; }
@@ -43,7 +43,7 @@
 ">=" { printf(">="); return TK_GREATER_THAN_EQUAL; }
 "*=" { printf("*="); return TK_MULT_EQUAL; }
 "/=" { printf("/="); return TK_DIV_EQUAL; }
-"%=" { printf("MOD="); return TK_MOD_EQUAL; }
+"%=" { printf("%s", "%="); return TK_MOD_EQUAL; }
 "^=" { printf("^="); return TK_PWR_EQUAL; }
 ":=" { printf(":="); return TK_ASSIGN; }
 "++" { printf("++"); return TK_PLUS_PLUS; }

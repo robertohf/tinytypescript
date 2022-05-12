@@ -22,7 +22,7 @@ int main (int argc, char *argv[]) {
         fprintf(stderr, "Missing input file(s). %s \n", argv[0]);
         return 1;
     }
-
+    
     bool parse_successfully = execute(argv[1]);
     if(parse_successfully) {
         cout << "\033[1;32m\n--COMPILED SUCCESSFULLY--\033[0m" << endl;
