@@ -25,10 +25,10 @@ int main (int argc, char *argv[]) {
 
     bool parse_successfully = execute(argv[1]);
     if(parse_successfully) {
-        cout << "\033[1;32m\n--COMPILED SUCCESSFULLY\033[0m" << endl;
+        cout << "\033[1;32m\n--COMPILED SUCCESSFULLY--\033[0m" << endl;
     }
     else {
-        cout << "\033[1;31m\n--COMPILED FAILED\033[0m" << endl; 
+        cout << "\033[1;31m\n--COMPILED FAILED--\033[0m" << endl; 
     }
     return 0;
 }
@@ -64,6 +64,8 @@ bool execute(const char* directory) {
 
                 yyrestart(yyin);
                 fclose(fp);
+
+                cout << endl;
             }
         }
         closedir(dir);

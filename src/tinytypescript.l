@@ -8,7 +8,7 @@
    FILE *fp;
 %}
 
-%x CommentBlock
+%x MultiLineComment
 
 %%
 "+" { printf("+"); return '+'; }
@@ -82,9 +82,11 @@
 [ ] { printf(" "); }
 . { printf("\nInvalid Lexical Character %c, Line No. %d", yytext[0], yylineno); return YYUNDEF; }
 
-<CommentBlock>"*/" { BEGIN(INITIAL); }
-<CommentBlock>[.|\n] {  }
-<CommentBlock><<EOF>> { printf("Block Comment not closed.\n"); }
+"//"[^\n]* { }
+"/*" { BEGIN(MultiLineComment); }
+<MultiLineComment>"*/" { BEGIN(INITIAL); }
+<MultiLineComment>.|\n {  }
+<MultiLineComment><<EOF>> { printf("Block Comment not closed.\n"); }
 %%
 
 int yywrap(void) {
