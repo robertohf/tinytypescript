@@ -7,7 +7,7 @@ The usage to deploy Tiny Typescript is by running this commands:
 
 ```bash
   make
-   ./tinytypescript folder_path_to_ts_files/
+  ./tinytypescript folder_path_to_ts_files/
 ```
 
 ## Cleaning
