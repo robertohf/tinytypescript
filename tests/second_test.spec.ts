@@ -14,7 +14,7 @@ console.log("Product:           "+res);
 res = num1 / num2
 console.log("Quotient:           "+res);
 
-res = num1 + num2
+res = num1 % num2
 console.log("Remainder:           "+res);
 
 num1++
