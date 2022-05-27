@@ -15,7 +15,7 @@ ${TARGET}_lexer.o: ${TARGET}_lexer.cpp
 	mv ${TARGET}_lexer.o bin
 
 ${TARGET}_lexer.cpp: src/${TARGET}.l
-	flex -o $@ $<
+	flex -d -o $@ $<
 	mv ${TARGET}_lexer.cpp build
 
 ${TARGET}_parser.o: ${TARGET}_parser.cpp
@@ -24,7 +24,7 @@ ${TARGET}_parser.o: ${TARGET}_parser.cpp
 
 ${TARGET}_parser.cpp: src/${TARGET}.y
 	mkdir -p build bin
-	bison --defines=tokens.h -o $@ $<	
+	bison --defines=tokens.h --debug -t -Wcounterexamples -o $@ $<	
 	mv tokens.h ${TARGET}_parser.cpp build
 
 clean:

@@ -12,8 +12,7 @@ extern FILE *fp;
 DIR *dir;
 struct dirent *ent;
 
-//int yyparse();
-int yylex();
+int yyparse();
 void yyrestart(FILE *input_file);
 bool execute(const char* argument);
 
@@ -24,22 +23,20 @@ int main (int argc, char *argv[]) {
     }
     
     bool parse_successfully = execute(argv[1]);
-    if(parse_successfully) {
-        cout << "\033[1;32m\n--COMPILED SUCCESSFULLY--\033[0m" << endl;
+    if(!parse_successfully) {
+        cout << "\033[1;32m\n--PARSED SUCCESSFULLY--\033[0m" << endl;
     }
-    else {
-        cout << "\033[1;31m\n--COMPILED FAILED--\033[0m" << endl; 
-    }
+    
     return 0;
 }
 
 bool execute(const char* directory) {
-    bool yyin_flag = true;
-    int parse_successfully = 0;
     std::string dir_path = directory;
     std::string file_path;
 
-    int token;
+    bool yyin_flag = true;
+    bool parse_flag = false;
+
     if((dir = opendir(dir_path.c_str())) != NULL) {
         while((ent = readdir(dir)) != NULL) {
             if((strstr(ent->d_name, ".ts") != NULL)) {
@@ -58,10 +55,7 @@ bool execute(const char* directory) {
                     yyin_flag = false;
                 }
 
-                /* parse_successfully = yyparse(); */
-                while ((token = yylex()) != 0)
-                    if(token == 257) return false;
-
+                parse_flag = yyparse();
                 yyrestart(yyin);
                 fclose(fp);
 
@@ -70,7 +64,5 @@ bool execute(const char* directory) {
         }
         closedir(dir);
     }
-
-    parse_successfully = true;
-    return parse_successfully;
+    return parse_flag;
 }

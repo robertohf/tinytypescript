@@ -16,6 +16,7 @@
 "*" { printf("*"); return '*'; }
 "/" { printf("/"); return '/'; }
 "%" { printf("%c", '%'); return '%'; }
+"^" { printf("^"); return '^'; }
 "=" { printf("="); return '='; }
 "(" { printf("("); return '('; }
 ")" { printf(")"); return ')'; }
@@ -23,7 +24,6 @@
 "}" { printf("}"); return '}'; }
 "[" { printf("["); return '['; }
 "]" { printf("]"); return ']'; }
-"^" { printf("^"); return '^'; }
 ";" { printf(";"); return ';'; }
 ":" { printf(":"); return ':'; }
 "," { printf(","); return ','; }
@@ -48,11 +48,13 @@
 ":=" { printf(":="); return TK_ASSIGN; }
 "++" { printf("++"); return TK_PLUS_PLUS; }
 "--" { printf("--"); return TK_MINUS_MINUS; }
+"=>" { printf(">="); return TK_ARROW; }
 "import" { printf("import"); return KW_IMPORT; }
 "export" { printf("export"); return KW_EXPORT; }
 "console" { printf("console"); return KW_CONSOLE; }
 "log" { printf("log"); return KW_LOG; }
 "number" { printf("number"); return KW_NUMBER; }
+"int" { printf("int"); return KW_INT; }
 "string" { printf("string"); return KW_STRING; }
 "boolean" { printf("boolean"); return KW_BOOLEAN; }
 "Array" { printf("Array"); return KW_ARRAY; }
@@ -65,13 +67,14 @@
 "if" { printf("if"); return KW_IF; }
 "in" { printf("in"); return KW_IN; }
 "return" { printf("return"); return KW_RETURN; }
-"true" { printf("true"); return KW_TRUE; }
-"false" { printf("false"); return KW_FALSE; }
+"function" { printf("function"); return KW_FUNCTION; }
 "var" { printf("var"); return KW_VAR; }
 "let" { printf("let"); return KW_LET; }
 "void" { printf("void"); return KW_VOID; }
 "of" { printf("of"); return KW_OF; }
 "continue" { printf("continue"); return KW_CONTINUE; }
+"true" { yylval.bool_t = true; printf("true"); return TK_BOOLEAN; }
+"false" { yylval.bool_t = false; printf("false"); return TK_BOOLEAN; }
 \'.*\' { yylval.string_t = strdup(yytext); printf("%s", yytext); return TK_STRING_LITERAL; }
 \".*\" { yylval.string_t = strdup(yytext); printf("%s", yytext); return TK_STRING_LITERAL; }
 [a-zA-Z][_|0-9|a-zA-Z]* { yylval.string_t = strdup(yytext); printf("%s", yytext); return TK_IDENTIFIER; }
@@ -86,7 +89,7 @@
 "/*" { BEGIN(MultiLineComment); }
 <MultiLineComment>"*/" { BEGIN(INITIAL); }
 <MultiLineComment>.|\n {  }
-<MultiLineComment><<EOF>> { printf("Block Comment not closed.\n"); }
+<MultiLineComment><<EOF>> { printf("Block Comment not closed.\n"); yyterminate(); }
 %%
 
 int yywrap(void) {
