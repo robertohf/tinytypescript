@@ -45,6 +45,11 @@ for(let i in arr) {
     console.log ("for each");
 }
 
+
+if(num1 in arr) {
+    console.log ("if in");
+}
+
 num1++;
 num2 -= 2;
 num1--;

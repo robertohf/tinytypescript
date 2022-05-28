@@ -30,14 +30,12 @@
 %token<int_t> TK_INTEGER 
 %token<bool_t> TK_BOOLEAN
 
-%precedence '='
-%precedence '!'
 %left TK_EQUAL_EQUAL TK_NOT_EQUAL
 %left '<' '>' TK_LESS_THAN_EQUAL TK_GREATER_THAN_EQUAL
 %left '+' '-' 
 %left '*' '/' '%' '^'
 %left TK_AND_AND TK_OR_OR
-%right TK_PLUS_PLUS TK_MINUS_MINUS
+%left TK_PLUS_PLUS TK_MINUS_MINUS
 
 %start DeclarationSourceFile
 
@@ -59,19 +57,19 @@ Type: KW_NUMBER
         | KW_VOID
 ;
 
-BlockStatement: Statement
-        |  BlockStatement Statement
+BlockStatement: Statement 
+        |  BlockStatement Statement 
 ;
 
-Statement: Expression SemiColonOpt
-        | ImportDeclaration SemiColonOpt
-        | LogStatement SemiColonOpt
-        | VariableDeclaration SemiColonOpt
-        | ReturnStatement SemiColonOpt
-        | BreakStatement SemiColonOpt
-        | ContinueStatement SemiColonOpt
+Statement: ImportDeclaration SemiColon
+        | LogStatement SemiColon
+        | VariableDeclaration SemiColon
+        | ReturnStatement SemiColon
+        | BreakStatement SemiColon
+        | ContinueStatement SemiColon
         | IfStatement
         | LoopStatement
+        | Expression SemiColon
 ;
 
 ImportDeclaration: KW_IMPORT TK_IDENTIFIER '=' TK_IDENTIFIER ';'
@@ -106,8 +104,11 @@ AssignOperator: '='
 MethodDeclaration: TypeAnnotation TK_IDENTIFIER '=' '(' ParameterList ')' TK_ARROW '{' BlockStatement '}'
         | TypeAnnotation TK_IDENTIFIER '=' '(' ')' TK_ARROW '{' BlockStatement '}'
         | TypeAnnotation TK_IDENTIFIER '=' '(' ParameterList ')' ':' Type TK_ARROW '{' BlockStatement '}'
+        | TypeAnnotation TK_IDENTIFIER '=' '(' ParameterList ')' TK_ARROW ':' Type TK_ARROW '{' BlockStatement '}'
         | TypeAnnotation TK_IDENTIFIER '=' '(' ')' TK_ARROW ':' Type TK_ARROW '{' BlockStatement '}'
         | TypeAnnotation TK_IDENTIFIER '=' '(' ')' ':' Type TK_ARROW '{' BlockStatement '}'
+        | TypeAnnotation TK_IDENTIFIER '(' ')' ':' Type TK_ARROW '{' BlockStatement '}'
+        | TypeAnnotation TK_IDENTIFIER '(' ')' ':' Type '{' BlockStatement '}'
 ;
 
 ParameterList: ParameterList ',' Parameter
@@ -127,12 +128,14 @@ ArrayDefinition: '[' ArgumentExpressionList ']'
 
 IfStatement: KW_IF '(' Expression ')' '{' BlockStatement '}'
         | KW_IF '(' Expression ')' '{' BlockStatement '}' KW_ELSE '{' BlockStatement '}'
+        | KW_IF '(' Expression KW_IN Expression')' '{' BlockStatement '}'
+        | KW_IF '(' Expression KW_IN Expression')' '{' BlockStatement '}' KW_ELSE '{' BlockStatement '}'
 ;
 
 LoopStatement: KW_WHILE '(' Expression ')' '{' BlockStatement '}'
         | KW_FOR '(' LoopExpr ';' LoopExpr ';' LoopExpr ')' '{' BlockStatement '}'
         | KW_FOR '(' TypeAnnotation TK_IDENTIFIER KW_IN TK_IDENTIFIER ')' '{' BlockStatement '}'
-        | KW_DO '{' BlockStatement '}' KW_WHILE '(' Expression ')' SemiColonOpt
+        | KW_DO '{' BlockStatement '}' KW_WHILE '(' Expression ')' SemiColon
 ;
 
 LoopExpr: %empty
@@ -205,8 +208,7 @@ PrimaryExpression: TK_IDENTIFIER
         | '(' Expression ')'
 ;
 
-SemiColonOpt: %empty
-       | ';'
+SemiColon: ';'
 ;
 %%
 

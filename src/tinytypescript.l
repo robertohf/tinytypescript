@@ -11,74 +11,74 @@
 %x MultiLineComment
 
 %%
-"+" { printf("+"); return '+'; }
-"-" { printf("-"); return '-'; }
-"*" { printf("*"); return '*'; }
-"/" { printf("/"); return '/'; }
-"%" { printf("%c", '%'); return '%'; }
-"^" { printf("^"); return '^'; }
-"=" { printf("="); return '='; }
-"(" { printf("("); return '('; }
-")" { printf(")"); return ')'; }
-"{" { printf("{"); return '{'; }
-"}" { printf("}"); return '}'; }
-"[" { printf("["); return '['; }
-"]" { printf("]"); return ']'; }
-";" { printf(";"); return ';'; }
-":" { printf(":"); return ':'; }
-"," { printf(","); return ','; }
-"." { printf("."); return '.'; }
-"<" { printf("<"); return '<'; }
-">" { printf(">"); return '>'; }
-"!" { printf("!"); return '!'; }
-"+=" { printf("+="); return TK_PLUS_EQUAL; }
-"&=" { printf("&="); return TK_AND_EQUAL; }
-"&&" { printf("&&"); return TK_AND_AND; }
-"||" { printf("||"); return TK_OR_OR; }
-"==" { printf("=="); return TK_EQUAL_EQUAL; }
-"!=" { printf("!="); return TK_NOT_EQUAL; }
-"-=" { printf("-="); return TK_MINUS_EQUAL; }
-"|=" { printf("|="); return TK_OR_EQUAL; }
-"<=" { printf("<="); return TK_LESS_THAN_EQUAL; }
-">=" { printf(">="); return TK_GREATER_THAN_EQUAL; }
-"*=" { printf("*="); return TK_MULT_EQUAL; }
-"/=" { printf("/="); return TK_DIV_EQUAL; }
-"%=" { printf("%s", "%="); return TK_MOD_EQUAL; }
-"^=" { printf("^="); return TK_PWR_EQUAL; }
-":=" { printf(":="); return TK_ASSIGN; }
-"++" { printf("++"); return TK_PLUS_PLUS; }
-"--" { printf("--"); return TK_MINUS_MINUS; }
-"=>" { printf(">="); return TK_ARROW; }
-"import" { printf("import"); return KW_IMPORT; }
-"export" { printf("export"); return KW_EXPORT; }
-"console" { printf("console"); return KW_CONSOLE; }
-"log" { printf("log"); return KW_LOG; }
-"number" { printf("number"); return KW_NUMBER; }
-"int" { printf("int"); return KW_INT; }
-"string" { printf("string"); return KW_STRING; }
-"boolean" { printf("boolean"); return KW_BOOLEAN; }
-"Array" { printf("Array"); return KW_ARRAY; }
-"break" { printf("break"); return KW_BREAK; }
-"const" { printf("const"); return KW_CONST; }
-"do" { printf("do"); return KW_DO; }
-"else" { printf("else"); return KW_ELSE; }
-"for" { printf("for"); return KW_FOR; }
-"while" { printf("while"); return KW_WHILE; }
-"if" { printf("if"); return KW_IF; }
-"in" { printf("in"); return KW_IN; }
-"return" { printf("return"); return KW_RETURN; }
-"function" { printf("function"); return KW_FUNCTION; }
-"var" { printf("var"); return KW_VAR; }
-"let" { printf("let"); return KW_LET; }
-"void" { printf("void"); return KW_VOID; }
-"of" { printf("of"); return KW_OF; }
-"continue" { printf("continue"); return KW_CONTINUE; }
-"true" { yylval.bool_t = true; printf("true"); return TK_BOOLEAN; }
-"false" { yylval.bool_t = false; printf("false"); return TK_BOOLEAN; }
-\'.*\' { yylval.string_t = strdup(yytext); printf("%s", yytext); return TK_STRING_LITERAL; }
-\".*\" { yylval.string_t = strdup(yytext); printf("%s", yytext); return TK_STRING_LITERAL; }
-[a-zA-Z][_|0-9|a-zA-Z]* { yylval.string_t = strdup(yytext); printf("%s", yytext); return TK_IDENTIFIER; }
-[0-9]+ { yylval.int_t = atoi(yytext); printf("%s", yytext); return TK_INTEGER; }
+"+" { return '+'; }
+"-" { return '-'; }
+"*" { return '*'; }
+"/" { return '/'; }
+"%" { return '%'; }
+"^" { return '^'; }
+"=" { return '='; }
+"(" { return '('; }
+")" { return ')'; }
+"{" { return '{'; }
+"}" { return '}'; }
+"[" { return '['; }
+"]" { return ']'; }
+";" { return ';'; }
+":" { return ':'; }
+"," { return ','; }
+"." { return '.'; }
+"<" { return '<'; }
+">" { return '>'; }
+"!" { return '!'; }
+"+=" { return TK_PLUS_EQUAL; }
+"&=" { return TK_AND_EQUAL; }
+"&&" { return TK_AND_AND; }
+"||" { return TK_OR_OR; }
+"==" { return TK_EQUAL_EQUAL; }
+"!=" { return TK_NOT_EQUAL; }
+"-=" { return TK_MINUS_EQUAL; }
+"|=" { return TK_OR_EQUAL; }
+"<=" { return TK_LESS_THAN_EQUAL; }
+">=" { return TK_GREATER_THAN_EQUAL; }
+"*=" { return TK_MULT_EQUAL; }
+"/=" { return TK_DIV_EQUAL; }
+"%=" { return TK_MOD_EQUAL; }
+"^=" { return TK_PWR_EQUAL; }
+":=" { return TK_ASSIGN; }
+"++" { return TK_PLUS_PLUS; }
+"--" { return TK_MINUS_MINUS; }
+"=>" { return TK_ARROW; }
+"import" { return KW_IMPORT; }
+"export" { return KW_EXPORT; }
+"console" { return KW_CONSOLE; }
+"log" { return KW_LOG; }
+"number" { return KW_NUMBER; }
+"int" { return KW_INT; }
+"string" { return KW_STRING; }
+"boolean" { return KW_BOOLEAN; }
+"Array" { return KW_ARRAY; }
+"break" { return KW_BREAK; }
+"const" { return KW_CONST; }
+"do" { return KW_DO; }
+"else" { return KW_ELSE; }
+"for" { return KW_FOR; }
+"while" { return KW_WHILE; }
+"if" { return KW_IF; }
+"in" { return KW_IN; }
+"return" { return KW_RETURN; }
+"function" { return KW_FUNCTION; }
+"var" { return KW_VAR; }
+"let" { return KW_LET; }
+"void" { return KW_VOID; }
+"of" { return KW_OF; }
+"continue" { return KW_CONTINUE; }
+"true" { yylval.bool_t = true; return TK_BOOLEAN; }
+"false" { yylval.bool_t = false; return TK_BOOLEAN; }
+\'.*\' { yylval.string_t = strdup(yytext); return TK_STRING_LITERAL; }
+\".*\" { yylval.string_t = strdup(yytext); return TK_STRING_LITERAL; }
+[a-zA-Z][_|0-9|a-zA-Z]* { yylval.string_t = strdup(yytext); return TK_IDENTIFIER; }
+[0-9]+ { yylval.int_t = atoi(yytext); return TK_INTEGER; }
 [\t] { printf("\t"); }
 [\r] { printf("\r"); }
 [\n] { printf("\n"); }

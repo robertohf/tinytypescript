@@ -58,8 +58,6 @@ bool execute(const char* directory) {
                 parse_flag = yyparse();
                 yyrestart(yyin);
                 fclose(fp);
-
-                cout << endl;
             }
         }
         closedir(dir);
