@@ -102,11 +102,13 @@ AssignOperator: '='
 ;
 
 MethodDeclaration: TypeAnnotation TK_IDENTIFIER '=' '(' ParameterList ')' TK_ARROW '{' BlockStatement '}'
-        | TypeAnnotation TK_IDENTIFIER '=' '(' ')' TK_ARROW '{' BlockStatement '}'
         | TypeAnnotation TK_IDENTIFIER '=' '(' ParameterList ')' ':' Type TK_ARROW '{' BlockStatement '}'
         | TypeAnnotation TK_IDENTIFIER '=' '(' ParameterList ')' TK_ARROW ':' Type TK_ARROW '{' BlockStatement '}'
-        | TypeAnnotation TK_IDENTIFIER '=' '(' ')' TK_ARROW ':' Type TK_ARROW '{' BlockStatement '}'
+        | TypeAnnotation TK_IDENTIFIER '(' ParameterList ')' ':' Type TK_ARROW '{' BlockStatement '}'
+        | TypeAnnotation TK_IDENTIFIER '(' ParameterList ')' ':' Type '{' BlockStatement '}'
+        | TypeAnnotation TK_IDENTIFIER '=' '(' ')' TK_ARROW '{' BlockStatement '}'
         | TypeAnnotation TK_IDENTIFIER '=' '(' ')' ':' Type TK_ARROW '{' BlockStatement '}'
+        | TypeAnnotation TK_IDENTIFIER '=' '(' ')' TK_ARROW ':' Type TK_ARROW '{' BlockStatement '}'
         | TypeAnnotation TK_IDENTIFIER '(' ')' ':' Type TK_ARROW '{' BlockStatement '}'
         | TypeAnnotation TK_IDENTIFIER '(' ')' ':' Type '{' BlockStatement '}'
 ;
