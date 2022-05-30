@@ -16,12 +16,20 @@ if (num1 > num2) {
 
 arr[1] = 15;
 
-let myAdd = (x: number, y: number): number => {
+let myAdd = (x: number, y: number) : number => {
     return x + y;
 };
 
 let mySyb = ():number => {
     return 10 + 5;
+};
+
+function add(x, y) {
+    return x + y;
+};
+
+let num = () => {
+    return 14 + 5;
 };
 
 let num6:number = mySyb();
@@ -39,7 +47,7 @@ while ( 5 < 5) {
 
 do {
     console.log ("do-while");
-} while(1<num1);
+} while(!num1);
 
 for(let i in arr) {
     console.log ("for each");

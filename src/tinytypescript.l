@@ -79,10 +79,10 @@
 \".*\" { yylval.string_t = strdup(yytext); return TK_STRING_LITERAL; }
 [a-zA-Z][_|0-9|a-zA-Z]* { yylval.string_t = strdup(yytext); return TK_IDENTIFIER; }
 [0-9]+ { yylval.int_t = atoi(yytext); return TK_INTEGER; }
-[\t] { printf("\t"); }
-[\r] { printf("\r"); }
-[\n] { printf("\n"); }
-[ ] { printf(" "); }
+[\t] { }
+[\r] { }
+[\n] { }
+[ ] { }
 . { printf("\nInvalid Lexical Character %c, Line No. %d", yytext[0], yylineno); return YYUNDEF; }
 
 "//"[^\n]* { }

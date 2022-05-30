@@ -14,15 +14,15 @@ struct dirent *ent;
 
 int yyparse();
 void yyrestart(FILE *input_file);
-bool execute(const char* argument);
+bool program(const char* argument);
 
 int main (int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Missing input file(s). %s \n", argv[0]);
         return 1;
     }
-    
-    bool parse_successfully = execute(argv[1]);
+
+    bool parse_successfully = program(argv[1]);
     if(!parse_successfully) {
         cout << "\033[1;32m\n--PARSED SUCCESSFULLY--\033[0m" << endl;
     }
@@ -30,7 +30,7 @@ int main (int argc, char *argv[]) {
     return 0;
 }
 
-bool execute(const char* directory) {
+bool program(const char* directory) {
     std::string dir_path = directory;
     std::string file_path;
 
