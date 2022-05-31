@@ -1,63 +1,55 @@
-let arr = [10, 10, 10];
-var num1:number = (10 + 20) * (10/2);
-var num2 = 2;
-num2 -= 2;
-
-let res:number;
-let flag:boolean = false;
-
-if (num1 > num2) {
-    res = num1 + num2;
-    console.log(res);
-} else {
-    res = num1 - num2;
-    console.log(res);
+let x: number = 10;
+let y = 20;
+ 
+if(x%2 == 0){
+  console.log("x is even");
+}
+else{
+  console.log("x is odd");
+}
+if (x > y) 
+{
+    console.log('x is greater than y.');
+} 
+else if (x < y)
+{
+    console.log('x is less than y.'); //This will be executed
+}
+else if (x == y) 
+{
+    console.log('x is equal to y');
 }
 
-arr[1] = 15;
+let a: number = 10;
+let b = 20;
+ 
+console.log("a = "+ a);
+console.log("b = "+ b);
+console.log("a+b = "+ a+b);
+console.log("a-b = "+ a-b);
+console.log("a*b = "+ a*b);	
+console.log("a/b = "+ a/b);
+console.log("a%b = "+ a%b);
+console.log("a>b = "+ a>b);
+console.log("a<b = "+ a<b);
+console.log("a>=b = "+ a>=b);
+console.log("a<=b = "+ a<=b);
+console.log("true&&true = "+ true && false);
 
-let myAdd = (x: number, y: number) : number => {
-    return x + y;
+const bubbleSort = (arr: number[]): number[] => {
+    const len = arr.length;
+ 
+    for (let i = 0; i < len; i++) {
+        for (let j = 0; j < len; j++) {
+            if (arr[j] > arr[j + 1]) {
+                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+            }
+        }
+    }
+ 
+    return arr;
 };
 
-let mySyb = ():number => {
-    return 10 + 5;
-};
+let sort = [5, 3, 1, 4, 6];
 
-function add(x, y) {
-    return x + y;
-};
-
-let num = () => {
-    return 14 + 5;
-};
-
-let num6:number = mySyb();
-let num4:number = myAdd(10, 5);
-
-for(let i = 0; i < 3; i++) {
-    console.log ("for");
-    continue;
-}
-
-while ( 5 < 5) {
-    console.log ("while");
-    break;
-}
-
-do {
-    console.log ("do-while");
-} while(!num1);
-
-for(let i in arr) {
-    console.log ("for each");
-}
-
-
-if(num1 in arr) {
-    console.log ("if in");
-}
-
-num1++;
-num2 -= 2;
-num1--;
+bubbleSort(sort);
