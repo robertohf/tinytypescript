@@ -3,8 +3,13 @@ TARGET = tinytypescript
 .PHONY: all
 all: ${TARGET}
 
-${TARGET}: ${TARGET}_parser.o ${TARGET}_lexer.o main.o
-	g++ --std=c++11 -g -o $@ bin/${TARGET}_parser.o bin/${TARGET}_lexer.o bin/main.o
+${TARGET}: ast.o ${TARGET}_parser.o ${TARGET}_lexer.o main.o
+	g++ --std=c++11 -g -o $@ bin/ast.o bin/${TARGET}_parser.o bin/${TARGET}_lexer.o bin/main.o
+
+ast.o: src/ast.cpp
+	g++ -std=c++11 -g -c -o $@ $<
+	mkdir -p build bin
+	mv ast.o bin
 
 main.o: src/main.cpp
 	g++ --std=c++11 -g -c -o $@ $<
@@ -23,12 +28,12 @@ ${TARGET}_parser.o: ${TARGET}_parser.cpp
 	mv ${TARGET}_parser.o bin
 
 ${TARGET}_parser.cpp: src/${TARGET}.y
-	mkdir -p build bin
 	bison --defines=tokens.h --debug -t -Wcounterexamples -o $@ $<	
 	mv tokens.h ${TARGET}_parser.cpp build
 
 clean:
 	rm -f *.o
+	rm -f *.asm
 	rm -f ${TARGET}
 	rm -rf ./build
 	rm -rf ./bin

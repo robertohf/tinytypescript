@@ -50,9 +50,9 @@
 "--" { return TK_MINUS_MINUS; }
 "=>" { return TK_ARROW; }
 "import" { return KW_IMPORT; }
-"export" { return KW_EXPORT; }
 "console" { return KW_CONSOLE; }
 "log" { return KW_LOG; }
+"float" { return KW_FLOAT; }
 "number" { return KW_NUMBER; }
 "int" { return KW_INT; }
 "string" { return KW_STRING; }
@@ -79,6 +79,7 @@
 \".*\" { yylval.string_t = strdup(yytext); return TK_STRING_LITERAL; }
 [a-zA-Z][_|0-9|a-zA-Z]* { yylval.string_t = strdup(yytext); return TK_IDENTIFIER; }
 [0-9]+ { yylval.int_t = atoi(yytext); return TK_INTEGER; }
+[0-9]+[\.[0-9]+] { yylval.float_t = atof(yytext); return TK_FLOAT; }
 [\t] { }
 [\r] { }
 [\n] { }
