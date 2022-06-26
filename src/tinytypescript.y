@@ -93,7 +93,7 @@
 DeclarationSourceFile: BlockStatement {
                                         assemblyFile.global = ".globl main\n";
                                         assemblyFile.data = ".data\n";
-                                        assemblyFile.text = ".text\n";
+                                        assemblyFile.text = ".text\nmain:\n";
 
                                         Stmt *root = new BlockStmt($1);
                                         std::string code = root->generateCode();
