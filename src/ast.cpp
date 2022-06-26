@@ -1,4 +1,11 @@
 #include "ast.h"
+#include <stack>
+#include <iostream>
+#include <sstream>
+#include <set>
+#include <string>
+#include <map>
+#include <list>
 
 /**
  * @brief Register Management Functions
@@ -104,6 +111,7 @@ namespace Label {
  * @brief Helper Functions
  * 
 **/
+
 namespace Helper {
     class MethodInfo{
     public:
@@ -326,6 +334,28 @@ namespace Helper {
     };
 };
 
+class ContextStack{
+    public:
+        struct ContextStack *prev;
+        std::map<std::string, Type> variables;
+    };
+
+ContextStack * context = NULL;
+
+Type getLocalVariabletype(std::string id){
+    ContextStack *currContext = context;
+    while(currContext != NULL){
+        if(currContext->variables[id] != 0){
+            return currContext->variables[id];
+        }
+        currContext = currContext->prev;
+    }
+    if(!context->variables.empty()){
+        return context->variables[id];
+    }
+    return INVALID;
+}
+
 /**
  * @brief Expression Functions
  * 
@@ -392,7 +422,20 @@ void FloatExpr::codeGenerator(Code &context) {
 }
 
 Type IdentExpr::evalType() { 
-    return INT; 
+    Type value;
+
+    if(context != NULL){
+        value = getLocalVariabletype(this->id);
+        if(value != 0){
+            return value;
+        }
+    }
+    value = getLocalVariabletype(this->id);
+    if(value == 0){
+        std::cout<<"Error: '" << this->id << "' was not declared in this scope line: " << this->line <<std::endl;
+        exit(0);
+    }
+    return value;
 }
 
 void IdentExpr::codeGenerator(Code &context) {
@@ -669,7 +712,23 @@ ARITHMETIC_EXPR_CODE_GEN(Mod, "%");
 ARITHMETIC_EXPR_CODE_GEN(Pwr, "^");
 UNARY_EXPR_CODE_GEN(Not, "!");
 
-Type ArrayExpr::evalType() { return INT; }
+Type ArrayExpr::evalType() {
+/*
+    int cont = 0;
+    Type idType = this->id->evalType();
+
+    std::list<Expr *>::iterator argsIt = this->indexExpr->begin();
+    while(argsIt != this->indexExpr.end()){
+        Expr *id = *argsIt;
+        if(id->evalType() != idType){
+            std::cout << "Error: Array " << this->id << "expression type does not match array type. Line: " << this->line <<std::endl;
+            exit(0);
+        }
+        argsIt++;
+    }
+    return this->id->evalType();
+    */
+}
 
 void ArrayExpr::codeGenerator(Code &context) {}
 

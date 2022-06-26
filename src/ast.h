@@ -44,7 +44,7 @@ class Expr : public AstNode {
 public:
     Expr() {}
     virtual ~Expr() {}
-    
+    int line;
     virtual Type evalType() = 0;
     virtual void codeGenerator(Code &context) = 0;
 };
@@ -185,7 +185,7 @@ class Stmt : public AstNode {
 public:
     Stmt() {}
     virtual ~Stmt() {}
-    
+    int line;
     virtual void execSemantics() = 0;
     virtual std::string generateCode() = 0;
 };
@@ -288,7 +288,7 @@ class InitDeclaration {
 public:
     InitDeclaration(Declarator *declarator, InitializerList *initializer) 
     : declarator(declarator), initializer(initializer) {}
-    
+    int line;
     Declarator *declarator; 
     InitializerList * initializer;
 };
@@ -297,7 +297,7 @@ class Declaration : public Stmt {
 public:
     Declaration(Type type, InitDeclarationList *declarations) 
     : type(type), declarations(declarations) {}
-
+    int line;
     Type type; 
     InitDeclarationList *declarations;
 
