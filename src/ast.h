@@ -51,7 +51,8 @@ public:
 
 class AssignExpr : public Expr {
 public:
-    AssignExpr(ExprPtr id, ExprPtr rightExpr) : id(id), rightExpr(rightExpr) {}
+    AssignExpr(ExprPtr id, ExprPtr rightExpr) 
+    : id(id), rightExpr(rightExpr) {}
     
     ExprPtr id, rightExpr;
     
@@ -61,7 +62,8 @@ public:
 
 class IntExpr : public Expr {
 public:
-    IntExpr(int value) : value(value) {}
+    IntExpr(int value) 
+    : value(value) {}
     
     int value;
     
@@ -71,7 +73,8 @@ public:
 
 class FloatExpr : public Expr {
 public:
-    FloatExpr(float value) : value(value) {}
+    FloatExpr(float value) 
+    : value(value) {}
     
     float value;
     
@@ -81,7 +84,8 @@ public:
 
 class IdentExpr : public Expr {
 public:
-    IdentExpr(std::string id) : id(id) {}
+    IdentExpr(std::string id) 
+    : id(id) {}
     
     std::string id;
     
@@ -91,7 +95,8 @@ public:
 
 class StringExpr : public Expr {
 public:
-    StringExpr(std::string value) : value(value) {}
+    StringExpr(std::string value) 
+    : value(value) {}
     
     std::string value;
     
@@ -101,7 +106,8 @@ public:
 
 class BoolExpr : public Expr {
 public:
-    BoolExpr(bool flag) : flag(flag) {}
+    BoolExpr(bool flag) 
+    : flag(flag) {}
     
     bool flag;
     
@@ -111,7 +117,8 @@ public:
 
 class MethodInvocation : public Expr {
 public:
-    MethodInvocation(IdentExpr *id, ArgumentList *args) : id(id), args(args) {}
+    MethodInvocation(IdentExpr *id, ArgumentList *args) 
+    : id(id), args(args) {}
     
     IdentExpr *id;
     ArgumentList *args;
@@ -123,7 +130,8 @@ public:
 #define BINARY_EXPR(name) \
 class name##Expr : public Expr { \
 public: \
-    name##Expr(ExprPtr leftExpr, ExprPtr rightExpr) : leftExpr(std::move(leftExpr)), rightExpr(std::move(rightExpr)) {} \
+    name##Expr(ExprPtr leftExpr, ExprPtr rightExpr) \
+    : leftExpr(std::move(leftExpr)), rightExpr(std::move(rightExpr)) {} \
     ExprPtr leftExpr, rightExpr; \
     Type evalType() override; \
     void codeGenerator(Code &context) override; \
@@ -132,7 +140,8 @@ public: \
 #define UNARY_EXPR(name) \
 class name##Expr : public Expr { \
 public: \
-    name##Expr(ExprPtr rightExpr) : rightExpr(std::move(rightExpr)) {} \
+    name##Expr(ExprPtr rightExpr) \
+    : rightExpr(std::move(rightExpr)) {} \
     ExprPtr rightExpr; \
     Type evalType() override; \
     void codeGenerator(Code &context) override; \
@@ -158,7 +167,8 @@ UNARY_EXPR(Not);
 
 class ArrayExpr : public Expr {
 public:
-    ArrayExpr(IdentExpr *id, ArgumentList *indexExpr) : id(id), indexExpr(indexExpr) {}
+    ArrayExpr(IdentExpr *id, ArgumentList *indexExpr) 
+    : id(id), indexExpr(indexExpr) {}
     
     IdentExpr *id;
     ArgumentList *indexExpr;
@@ -182,7 +192,8 @@ public:
 
 class BlockStmt : public Stmt {
 public:
-    BlockStmt(StmtList *stmtList) : stmtList(stmtList) { }
+    BlockStmt(StmtList *stmtList) 
+    : stmtList(stmtList) { }
     
     StmtList *stmtList;
     
@@ -192,7 +203,8 @@ public:
 
 class AssignStmt : public Stmt {
 public:
-    AssignStmt(IdentExpr *id, ExprPtr rightExpr) : id(id), rightExpr(rightExpr) {}
+    AssignStmt(IdentExpr *id, ExprPtr rightExpr) 
+    : id(id), rightExpr(rightExpr) {}
     
     IdentExpr *id;
     ExprPtr rightExpr;
@@ -203,7 +215,8 @@ public:
 
 class PrintStmt : public Stmt {
 public:
-    PrintStmt(ExprPtr expr) : expr(expr) {}
+    PrintStmt(ExprPtr expr)
+    : expr(expr) {}
     
     ExprPtr expr;
     
@@ -213,7 +226,8 @@ public:
 
 class ReturnStmt : public Stmt {
 public:
-    ReturnStmt(ExprPtr expr) : expr(expr) {}
+    ReturnStmt(ExprPtr expr) 
+    : expr(expr) {}
     
     ExprPtr expr;
     
@@ -239,7 +253,8 @@ public:
 
 class Declarator {
 public:
-    Declarator(std::string id, ExprPtr arrayDeclaration, bool isArray) : id(id), arrarDeclaration(arrayDeclaration), isArray(isArray) {}
+    Declarator(std::string id, ExprPtr arrayDeclaration, bool isArray) 
+    : id(id), arrarDeclaration(arrayDeclaration), isArray(isArray) {}
 
     std::string id;
     ExprPtr arrarDeclaration;
@@ -248,17 +263,17 @@ public:
 
 class Parameter {
 public:
-    Parameter(Type type, Declarator *declarator) : type(type), declarator(declarator) {}
+    Parameter(Type type, Declarator *declarator) 
+    : type(type), declarator(declarator) {}
 
     Type type;
     Declarator *declarator;
-
-    void execSemantics();
 };
 
 class MethodDeclaration : public Stmt {
 public:
-    MethodDeclaration(std::string id, ParameterList *parameters, Type type, StmtList *stmtList) : id(id), parameters(parameters), type(type), stmtList(stmtList) {}
+    MethodDeclaration(std::string id, ParameterList *parameters, Type type, StmtList *stmtList) 
+    : id(id), parameters(parameters), type(type), stmtList(stmtList) {}
     
     std::string id;
     ParameterList *parameters;
@@ -269,29 +284,31 @@ public:
     std::string generateCode() override;
 };
 
-class InitDeclaration : public Stmt {
+class InitDeclaration {
 public:
-    InitDeclaration(Declarator *declarator, InitializerList *initializer) : declarator(declarator), initializer(initializer) {}
-
+    InitDeclaration(Declarator *declarator, InitializerList *initializer) 
+    : declarator(declarator), initializer(initializer) {}
+    
     Declarator *declarator; 
     InitializerList * initializer;
-
-    std::string generateCode() override;
 };
 
 class Declaration : public Stmt {
 public:
-    Declaration(Type type, InitDeclarationList declarations) : type(type), declarations(declarations) {}
+    Declaration(Type type, InitDeclarationList *declarations) 
+    : type(type), declarations(declarations) {}
 
     Type type; 
-    InitDeclarationList declarations;
+    InitDeclarationList *declarations;
 
+    void execSemantics() override;
     std::string generateCode() override;
 };
 
 class IfStmt : public Stmt {
 public:
-    IfStmt(ExprPtr conditionExpr, StmtList *tStatement, StmtList *fStatement) : conditionExpr(conditionExpr), tStatement(tStatement) , fStatement(fStatement) {}
+    IfStmt(ExprPtr conditionExpr, StmtList *tStatement, StmtList *fStatement) 
+    : conditionExpr(conditionExpr), tStatement(tStatement) , fStatement(fStatement) {}
     
     ExprPtr conditionExpr;
     StmtList *tStatement, *fStatement;
@@ -302,7 +319,8 @@ public:
 
 class WhileStmt : public Stmt {
 public:
-    WhileStmt(ExprPtr conditionExpr, StmtList *stmtList) : conditionExpr(conditionExpr), stmtList(stmtList) {}
+    WhileStmt(ExprPtr conditionExpr, StmtList *stmtList) 
+    : conditionExpr(conditionExpr), stmtList(stmtList) {}
     
     ExprPtr conditionExpr;
     StmtList *stmtList;
@@ -313,11 +331,12 @@ public:
 
 class ForStmt : public Stmt {
 public:
-    ForStmt(Declaration *decl, ExprPtr expr, StmtPtr assignOpStmt, StmtList *stmtList) : decl(decl), assignOpStmt(assignOpStmt), expr(expr), stmtList(stmtList) {}
+    ForStmt(Declaration *decl, ExprPtr expr, ExprPtr assignOpExpr, StmtList *stmtList) 
+    : decl(decl), assignOpExpr(assignOpExpr), expr(expr), stmtList(stmtList) {}
     
     Declaration *decl;
     ExprPtr expr;  
-    StmtPtr assignOpStmt;
+    ExprPtr assignOpExpr;
     StmtList *stmtList;
     
     void execSemantics() override;
@@ -326,7 +345,8 @@ public:
 
 class ExprStmt : public Stmt {
 public:
-    ExprStmt(ExprPtr expr) : expr(expr) {}
+    ExprStmt(ExprPtr expr) 
+    : expr(expr) {}
     
     ExprPtr expr;
     

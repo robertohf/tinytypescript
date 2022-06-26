@@ -330,7 +330,6 @@ namespace Helper {
  * @brief Expression Functions
  * 
 **/
-
 Type AssignExpr::evalType() { 
     return INT; 
 }
@@ -339,8 +338,9 @@ void AssignExpr::codeGenerator(Code &context) {
     Code rhs;
     std::stringstream code;
 
-    this->rightExpr->codeGenerator(context);
+    this->rightExpr->codeGenerator(rhs);
     code << rhs.code << std::endl;
+    Registers::releaseRegister(rhs.registerAt);
 
     std::string name = ((IdentExpr *)this->id)->id;
     if(Helper::codeGenVariables.find(name) == Helper::codeGenVariables.end()) {
@@ -351,9 +351,9 @@ void AssignExpr::codeGenerator(Code &context) {
         }
     } else {
         if(rhs.type == INT) {
-            code << "sw " << rhs.registerAt << Helper::codeGenVariables[name]->offset << "($sp)" << std::endl;
+            code << "sw " << rhs.registerAt << " " << Helper::codeGenVariables[name]->offset << "($sp)" << std::endl;
         } else if(rhs.type == FLOAT) {
-            code << "s.s " << rhs.registerAt << Helper::codeGenVariables[name]->offset << "($sp)" << std::endl; 
+            code << "s.s " << rhs.registerAt << " " << Helper::codeGenVariables[name]->offset << "($sp)" << std::endl; 
         }
     }
 
@@ -775,8 +775,6 @@ std::string PrintStmt::generateCode() {
     return code.str(); 
 }
 
-void Parameter::execSemantics() {}
-
 void MethodDeclaration::execSemantics() {
     if (this->parameters->size() > 4) {
         std::cerr<<"Error: only 4 paramaters can be used " << std::endl;
@@ -859,11 +857,13 @@ std::string MethodDeclaration::generateCode() {
     return result; 
 }
 
+void Declaration::execSemantics() {}
+
 std::string Declaration::generateCode() {
     std::stringstream code;
-    std::list<InitDeclaration *>::iterator it = this->declarations.begin();
+    std::list<InitDeclaration *>::iterator it = this->declarations->begin();
 
-    while(it != this->declarations.end()) {
+    while(it != this->declarations->end()) {
         InitDeclaration *declaration = *(it);
         
         if(!declaration->declarator->isArray) {
@@ -974,7 +974,6 @@ std::string ForStmt::generateCode() {
 
     this->expr->codeGenerator(context);
     Registers::releaseRegister(context.registerAt);
-
     code << forLabel << ": " << std::endl;
     code << context.code << std::endl;
     
@@ -988,7 +987,11 @@ std::string ForStmt::generateCode() {
         code << it->generateCode();
     
     code << assignForLabel << ": " << std::endl;
-    code << this->assignOpStmt->generateCode();
+    
+    this->assignOpExpr->codeGenerator(context);
+    Registers::releaseRegister(context.registerAt);
+    code << context.code << std::endl;
+
 
     code << "j " << forLabel << std::endl;
     code << endForLabel << ": " << std::endl;

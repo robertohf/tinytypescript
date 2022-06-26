@@ -42,10 +42,14 @@
     Stmt *stmt_t;
     Expr *expr_t;
     Parameter *parameter_t;
-
+    Declaration *declaration_t;
+    Declarator *declarator_t;
     StmtList *stmt_list_t;
     ParameterList *parameter_list_t;
     ArgumentList *argument_list_t;
+    InitializerList *initializer_t;
+    InitDeclaration *init_declaration_t;
+    InitDeclarationList *init_declaration_list_t;
 };
 
 %token TK_PLUS_EQUAL TK_AND_EQUAL TK_AND_AND TK_OR_OR TK_EQUAL_EQUAL TK_LESS_THAN_EQUAL
@@ -68,15 +72,20 @@
 %left TK_AND_AND TK_OR_OR
 %left TK_PLUS_PLUS TK_MINUS_MINUS
 
+%type<declarator_t> Declarator
+%type<declaration_t> VariableDeclaration
+%type<initializer_t> Initializer
 %type<parameter_t> Parameter
 %type<parameter_list_t> ParameterList 
 %type<argument_list_t> ArgumentExpressionList
 %type<int_t> Type AssignOperator
 %type<stmt_t> Statement ImportDeclaration LogStatement DeclarationStatement ReturnStatement BreakStatement
-%type<stmt_t> ContinueStatement IfStatement LoopStatement ExpressionStmt AssignStatement MethodDeclaration
+%type<stmt_t> ContinueStatement IfStatement LoopStatement ExpressionStmt MethodDeclaration
 %type<expr_t> Expression AssignExpression LogicalExpression EqualityExpression RelativeExpression ArithmeticExpression
-%type<expr_t> UnaryExpression PostfixExpression PrimaryExpression LoopExpr
+%type<expr_t> UnaryExpression PostfixExpression PrimaryExpression
 %type<stmt_list_t> BlockStatement
+%type<init_declaration_list_t> InitDeclarationList
+%type<init_declaration_t> InitDeclaration
 
 %start DeclarationSourceFile
 
@@ -92,20 +101,6 @@ DeclarationSourceFile: BlockStatement {
                                         assemblyFile.text += code;
                                         write("result.asm");
                                     }
-;
-
-TypeAnnotation: KW_VAR
-        | KW_LET
-        | KW_CONST
-        | KW_FUNCTION
-;
-
-Type: KW_FLOAT { $$ = FLOAT; }
-        | KW_STRING { $$ = STRING; }
-        | KW_BOOLEAN { $$ = BOOL; }
-        | KW_INT { $$ = INT; }
-        | KW_NUMBER { $$ = INT; }
-        | KW_VOID { $$ = VOID; }
 ;
 
 BlockStatement: Statement { $$ = new StmtList; $$->push_back($1); }
@@ -129,14 +124,46 @@ ImportDeclaration: KW_IMPORT TK_IDENTIFIER '=' TK_IDENTIFIER ';' {}
 LogStatement: KW_CONSOLE '.' KW_LOG '(' Expression ')' { $$ = new PrintStmt($5); }
 ;
 
-DeclarationStatement: AssignStatement { $$ = $1; }
+DeclarationStatement: VariableDeclaration { $$ = $1; }
         /* | ArrayDeclaration { $$ = $1; } */
         | MethodDeclaration { $$ = $1; }
 ;
 
-AssignStatement: TypeAnnotation TK_IDENTIFIER ':' Type { $$ = new AssignStmt((IdentExpr *)$2, nullptr); }
-        | TypeAnnotation TK_IDENTIFIER ':' Type '=' Expression { $$ = new AssignStmt((IdentExpr *)$2, $6); }
+TypeAnnotation: KW_VAR
+        | KW_LET
+        | KW_CONST
+        | KW_FUNCTION
 ;
+
+Type: KW_FLOAT { $$ = FLOAT; }
+        | KW_STRING { $$ = STRING; }
+        | KW_BOOLEAN { $$ = BOOL; }
+        | KW_INT { $$ = INT; }
+        | KW_NUMBER { $$ = INT; }
+        | KW_VOID { $$ = VOID; }
+;
+
+VariableDeclaration: TypeAnnotation InitDeclarationList ':' Type { $$ = new Declaration((Type)$4, $2); }
+;
+
+InitDeclarationList: InitDeclaration { $$ = new InitDeclarationList; $$->push_back($1); }
+        | InitDeclarationList ',' InitDeclaration { $$ = $1; $$->push_back($3); }
+;
+
+InitDeclaration: Declarator { $$ = new InitDeclaration($1, (new InitializerList)); }
+        | Declarator '=' Initializer { $$ = new InitDeclaration($1, $3); }
+;
+
+Declarator: TK_IDENTIFIER { $$ = new Declarator($1, NULL, false); }
+        | TK_IDENTIFIER '[' Expression ']' { $$ = new Declarator($1, $3, true); }
+;
+
+Initializer: Expression { $$ = new InitializerList; $$->push_back($1); }
+;
+
+/* VariableDeclaration: TypeAnnotation TK_IDENTIFIER ':' Type { $$ = new AssignStmt((IdentExpr *)$2, nullptr); }
+        | TypeAnnotation TK_IDENTIFIER ':' Type '=' Expression { $$ = new AssignStmt((IdentExpr *)$2, $6); }
+; */
 
 /* ArrayDeclaration: TypeAnnotation TK_IDENTIFIER '=' ArrayDefinition {}
         | TypeAnnotation TK_IDENTIFIER ':' Type '[' ']' '=' ArrayDefinition {}
@@ -180,12 +207,8 @@ IfStatement: KW_IF '(' Expression ')' '{' BlockStatement '}' { $$ = new IfStmt($
 
 LoopStatement: KW_WHILE '(' Expression ')' '{' BlockStatement '}' { $$ = new WhileStmt($3, $6); }
         /* | KW_DO '{' BlockStatement '}' KW_WHILE '(' Expression ')' SemiColon {} */
-        | KW_FOR '(' LoopExpr ';' LoopExpr ';' LoopExpr ')' '{' BlockStatement '}' { $$ = new ForStmt($3, $5, $7, $10); }
+        | KW_FOR '(' VariableDeclaration ';' Expression ';' AssignExpression ')' '{' BlockStatement '}' { $$ = new ForStmt($3, $5, $7, $10); }
         /* | KW_FOR '(' TypeAnnotation TK_IDENTIFIER KW_IN TK_IDENTIFIER ')' '{' BlockStatement '}' {} */
-;
-
-LoopExpr: %empty {/* Empty */}
-        | Expression { $$ = $1; }
 ;
 
 ExpressionStmt: Expression { $$ = new ExprStmt($1); }
@@ -280,6 +303,9 @@ void write(std::string name) {
     file << assemblyFile.data << std::endl
     << assemblyFile.global << std::endl 
     << assemblyFile.text << std::endl;
+
+    file << "li $v0, 10" << std::endl
+    << "syscall"  << std::endl;
     file.close();
 }
 
