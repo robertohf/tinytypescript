@@ -17,29 +17,27 @@
 //     x = x + 1;
 // }
 
-let addFunc = (num1: number, num2: number): number => {
+var addFunc = (num1: number, num2: number): number => {
     return num1 + num2;
 };
 
-let subFunc = (num1: number, num2: number): number => {
+function subFunc(num1: number, num2: number): number {
     return num1 - num2;
 };
 
-let multFunc = (num1: number, num2: number): number => {
+function multFunc(num1: number, num2: number): number {
     return num1 * num2;
 };
 
-let divFunc = (num1: number, num2: number): number => {
+function divFunc(num1: number, num2: number): number {
     return num1 / num2;
 };
 
-let modFunc = (num1: number, num2: number): number => {
+function modFunc(num1: number, num2: number): number {
     return num1 % num2;
 };
 
-let main = () : void => {
-    let x, y, z : number;
-
+function main () : void {
     console.log("Add: ");
     console.log(addFunc(5, 15));
     console.log("\n");
@@ -59,4 +57,17 @@ let main = () : void => {
     console.log("Mod: ");
     console.log(modFunc(5, 50));
     console.log("\n");
+
+    let x, y, z : number;
+
+    let w : number;
+
+    x = 20;
+    y = 25;
+
+    if(x < y) {
+        z = x + y;
+    }
+
+    console.log(z);
 };
