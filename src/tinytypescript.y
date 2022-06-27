@@ -173,16 +173,16 @@ ArrayDefinition: '[' ArgumentExpressionList ']' {}
         | '[' ']' {}
 ; */
 
-MethodDeclaration: TypeAnnotation TK_IDENTIFIER '=' '(' ParameterList ')' ':' Type TK_ARROW '{' BlockStatement '}' { $$ = new MethodDeclaration($2, $5, (Type)$8, $11); }
+MethodDeclaration: TypeAnnotation TK_IDENTIFIER '(' ParameterList ')' ':' Type TK_ARROW '{' BlockStatement '}' { $$ = new MethodDeclaration($2, $4, (Type)$7, $10); }
+/* TypeAnnotation TK_IDENTIFIER '=' '(' ParameterList ')' ':' Type TK_ARROW '{' BlockStatement '}' { $$ = new MethodDeclaration($2, $5, (Type)$8, $11); } */
         /* | TypeAnnotation TK_IDENTIFIER '=' '(' ParameterList ')' ':' Type '[' ']' TK_ARROW '{' BlockStatement '}' { $$ = new MethodDeclaration($2, $5, $8, ); } */
-        | TypeAnnotation TK_IDENTIFIER '(' ParameterList ')' ':' Type TK_ARROW '{' BlockStatement '}' { $$ = new MethodDeclaration($2, $4, (Type)$7, $10); }
         | TypeAnnotation TK_IDENTIFIER '(' ParameterList ')' ':' Type '{' BlockStatement '}' { $$ = new MethodDeclaration($2, $4, (Type)$7, $9); }
-        | TypeAnnotation TK_IDENTIFIER ':' '(' ParameterList ')' TK_ARROW Type '=' KW_FUNCTION '{' BlockStatement '}' { $$ = new MethodDeclaration($2, $5, (Type)$8, $12); }
-        | TypeAnnotation TK_IDENTIFIER '=' '(' ')' ':' Type TK_ARROW '{' BlockStatement '}' { $$ = new MethodDeclaration($2, nullptr, (Type)$7, $10); }
+        /* | TypeAnnotation TK_IDENTIFIER ':' '(' ParameterList ')' TK_ARROW Type '=' KW_FUNCTION '{' BlockStatement '}' { $$ = new MethodDeclaration($2, $5, (Type)$8, $12); } */
+        /* | TypeAnnotation TK_IDENTIFIER '=' '(' ')' ':' Type TK_ARROW '{' BlockStatement '}' { $$ = new MethodDeclaration($2, nullptr, (Type)$7, $10); } */
         /* | TypeAnnotation TK_IDENTIFIER '=' '(' ')' ':' Type '[' ']' TK_ARROW '{' BlockStatement '}' { $$ = new MethodDeclaration($2); } */
         | TypeAnnotation TK_IDENTIFIER '(' ')' ':' Type TK_ARROW '{' BlockStatement '}' { $$ = new MethodDeclaration($2, nullptr, (Type)$6, $9); }
         | TypeAnnotation TK_IDENTIFIER '(' ')' ':' Type '{' BlockStatement '}' { $$ = new MethodDeclaration($2, nullptr, (Type)$6, $8); }
-        | TypeAnnotation TK_IDENTIFIER ':' '(' ')' TK_ARROW Type '=' KW_FUNCTION '{' BlockStatement '}' { $$ = new MethodDeclaration($2, nullptr, (Type)$7, $11); }
+        /* | TypeAnnotation TK_IDENTIFIER ':' '(' ')' TK_ARROW Type '=' KW_FUNCTION '{' BlockStatement '}' { $$ = new MethodDeclaration($2, nullptr, (Type)$7, $11); } */
 ;
 
 ParameterList: Parameter { $$ = new ParameterList; $$->push_back($1); }
