@@ -116,7 +116,7 @@ namespace Helper {
     class MethodInfo{
     public:
         Type returnType;
-        std::list<Parameter *> parameters;
+        std::list<Parameter *> *parameters;
     };
 
     class CodeGenVariableInfo {
@@ -143,12 +143,13 @@ namespace Helper {
                                                                         {"==", "beq "}, {"!=", "bne "}
                                                                     };
         std::unordered_map<std::string, std::string> relativeOpMap = {
-                                                                        {">=", "bge "}, {">", "sgt "},
-                                                                        {"<=", "ble "}, {"<", "slt "}
+                                                                        {">=", "sge "}, {">", "sgt "},
+                                                                        {"<=", "sle "}, {"<", "slt "}
                                                                     };
         std::unordered_map<std::string, std::string> arithmeticOpMap = {
                                                                         {"+", "add "}, {"-", "sub "},
-                                                                        {"*", "mult "}, {"/", "div "}
+                                                                        {"*", "mult "}, {"/", "div "},
+                                                                        {"%", "div "}
                                                                     };
 
         /* Chooses What (Int) Logical Operation To Do Based On the Operator */
@@ -201,7 +202,7 @@ namespace Helper {
                 code << "li " << iTemp << ", 1" << std::endl;
                 code << label2 << ": " << std::endl;
                 
-            } else {
+            } else if(op.compare("!=") == 0){
                 code << equalityOperation << lhs.registerAt << ", " << rhs.registerAt << ", " << label2 << std::endl;
                 code << "li " << iTemp << ", 0" << std::endl;
                 code << "j " << label1 << std::endl;
@@ -221,16 +222,16 @@ namespace Helper {
             std::string relativeOperation = relativeOpMap[op];
 
             /* We Will Need A Label And A Temp If Condition Is Not Met */
-            // std::string label1 = Label::newLabel("greater_than_equal");
-            // std::string label2 = Label::newLabel("less_than_equal"); 
-            std::string label3 = Label::newLabel("greater_than");
-            std::string label4 = Label::newLabel("less_than"); 
             std::string iTemp = Registers::Integer::getRegister();
 
             if(op.compare(">") == 0) {
-                code << relativeOperation << iTemp << ", " << lhs.registerAt << ", " << rhs.registerAt << std::endl;
+                code << relativeOperation << iTemp << " " << lhs.registerAt << ", " << rhs.registerAt << std::endl;
             } else if(op.compare("<") == 0) {
-                code << relativeOperation << iTemp << ", " << lhs.registerAt << ", " << rhs.registerAt << std::endl;
+                code << relativeOperation << iTemp << " " << lhs.registerAt << ", " << rhs.registerAt << std::endl;
+            } else if((op.compare(">=") == 0)) {
+                code << relativeOperation << iTemp << " " << lhs.registerAt << ", " << rhs.registerAt << std::endl;
+            } else if((op.compare("<=") == 0)) {
+                code << relativeOperation << iTemp << " " << lhs.registerAt << ", " << rhs.registerAt << std::endl;
             }
 
             context.registerAt = iTemp;
@@ -243,10 +244,15 @@ namespace Helper {
             context.registerAt = Registers::Integer::getRegister(); 
             std::string arithmeticOperation = arithmeticOpMap[op];
             
-            if((op.compare("+") == 0)|| (op.compare("-") == 0))
-                code << arithmeticOperation << context.registerAt << ", " << lhs.registerAt << ", " << rhs.registerAt;
-            else
-                code << arithmeticOperation << lhs.registerAt << ", " << rhs.registerAt << std::endl << "mflo " << context.registerAt;
+            if((op.compare("+") == 0) || (op.compare("-") == 0)) {
+                code << arithmeticOperation << context.registerAt << ", " << lhs.registerAt << ", " << rhs.registerAt << std::endl;
+            } else if((op.compare("*") == 0) || (op.compare("/") == 0)) {
+                code << arithmeticOperation << lhs.registerAt << ", " << rhs.registerAt << std::endl
+                << "mflo " << context.registerAt;
+            } else if(op.compare("%") == 0) {
+                code << arithmeticOperation << lhs.registerAt << ", " << rhs.registerAt << std::endl 
+                << "mfhi " << context.registerAt;
+            }
 
             return code.str(); 
         }
@@ -257,7 +263,8 @@ namespace Helper {
                                                                         {"==", "c.eq.s "}, {"!=", "c.ne.s "}
                                                                     };
         std::unordered_map<std::string, std::string> relativeOpMap = {
-                                                                        {">", "c.lt.s "}, {"<", "c.gt.s "}
+                                                                        {">", "c.lt.s "}, {"<", "c.gt.s "},
+                                                                        {">", "c.le.s "}, {"<", "c.ge.s "}
                                                                     };
         std::unordered_map<std::string, std::string> arithmeticOpMap = {
                                                                         {"+", "add.s "}, {"-", "sub.s "},
@@ -443,21 +450,16 @@ void IdentExpr::codeGenerator(Code &context) {
     if(Helper::codeGenVariables.find(this->id) == Helper::codeGenVariables.end()) {
         context.type = Helper::globalVariables[this->id];
 
-        std::cout << Helper::globalVariables[this->id] << std::endl;
         if(Helper::globalVariables[this->id] == INT) {
             std::string iTemp = Registers::Integer::getRegister();
-            std::string label = Label::newLabel(this->id);
             
             context.registerAt = iTemp;
             context.code = "lw " + iTemp + ", " + this->id + "\n";
-            assemblyFile.data += label + ": .word ";
         } else if(Helper::globalVariables[this->id] == FLOAT) {
             std::string fTemp = Registers::Float::getRegister();
-            std::string label = Label::newLabel(this->id);
 
             context.registerAt = fTemp;
             context.code = "l.s " + fTemp + ", " + this->id + "\n";
-            assemblyFile.data += label + ": .word ";
         }
     } else {
         context.type = Helper::codeGenVariables[this->id]->type;
@@ -501,17 +503,17 @@ void BoolExpr::codeGenerator(Code &context) {}
 Type MethodInvocation::evalType() {
     Helper::MethodInfo *method = Helper::methods[this->id->id];
     
-    if (method == NULL) {
+    if(method == NULL) {
         std::cerr<<"Error: invocation of undefined method: " << this->id->id << std::endl;
         exit(0);
     }
 
-    if (method->parameters.size() > this->args->size()) {
+    if(method->parameters->size() > this->args->size()) {
         std::cerr<<"Error: too few arguments for method: " << this->id->id << std::endl;
         exit(0);
     }
 
-    if (method->parameters.size() < this->args->size()) {
+    if(method->parameters->size() < this->args->size()) {
         std::cerr<<"Error: too many arguments for method: "<<this->id->id << std::endl;
         exit(0);
     }
@@ -549,13 +551,17 @@ void MethodInvocation::codeGenerator(Code &context) {
 
     code << "jal " << this->id->id << std::endl;
     std::string result;
+
+    Helper::methods[this->id->id]->returnType = this->evalType();
+
     if(Helper::methods[this->id->id]->returnType == INT) {
         result = Registers::Integer::getRegister();
-        code << "move " << result << ", v0" << std::endl;
+        code << "move " << result << ", $v0" << std::endl;
     } else if(Helper::methods[this->id->id]->returnType == FLOAT) {
         result = Registers::Float::getRegister();
         code << "mtc1 $v0, " << result << std::endl;
     }
+
 
     context.code = code.str();
     context.registerAt = result;
@@ -835,16 +841,21 @@ std::string PrintStmt::generateCode() {
 }
 
 void MethodDeclaration::execSemantics() {
-    if (this->parameters->size() > 4) {
-        std::cerr<<"Error: only 4 paramaters can be used " << std::endl;
-        exit(0);
+    if(this->parameters != nullptr) {
+        if (this->parameters->size() > 4) {
+            std::cerr<<"Error: only 4 paramaters can be used " << std::endl;
+            exit(0);
+        }
     }
-    
 
     if (Helper::methods[this->id] != 0) {
         std::cout<<"Error: redefinition of method "<< std::endl;
         exit(0);
     }
+
+    Helper::methods[this->id] = new Helper::MethodInfo();
+    Helper::methods[this->id]->returnType = this->type;
+    Helper::methods[this->id]->parameters = this->parameters;
 }
 
 std::string storeState() {
@@ -879,19 +890,21 @@ std::string MethodDeclaration::generateCode() {
     code << state << std::endl;
 
     /* Parameters */
-    if(this->parameters->size() > 0) {
-        std::list<Parameter *>::iterator paramIt = this->parameters->begin();
+    if(this->parameters != nullptr) {
+        if(this->parameters->size() > 0) {
+            std::list<Parameter *>::iterator paramIt = this->parameters->begin();
 
-        for(int i = 0; i < this->parameters->size(); i++) {
-            code << "sw $a" << i << ", " << stackPointer << "($sp)" << std::endl;
-            
-            Helper::codeGenVariables[(*paramIt)->declarator->id] =
-                new Helper::CodeGenVariableInfo(stackPointer, false, true, (*paramIt)->type);
-            
-            stackPointer += 4;
-            Helper::globalStackPointer += 4;
+            for(int i = 0; i < this->parameters->size(); i++) {
+                code << "sw $a" << i << ", " << stackPointer << "($sp)" << std::endl;
+                
+                Helper::codeGenVariables[(*paramIt)->declarator->id] =
+                    new Helper::CodeGenVariableInfo(stackPointer, false, true, (*paramIt)->type);
+                
+                stackPointer += 4;
+                Helper::globalStackPointer += 4;
 
-            paramIt++;
+                paramIt++;
+            }
         }
     }
 
@@ -934,7 +947,7 @@ std::string Declaration::generateCode() {
  
         }
 
-        if(declaration->initializer != nullptr) {
+        if(declaration->initializer != NULL) {
             std::list<Expr *>::iterator exprIt = declaration->initializer->begin();
             int offset = Helper::codeGenVariables[declaration->declarator->id]->offset;
 
@@ -967,6 +980,7 @@ std::string IfStmt::generateCode() {
     std::string end_if_label = Label::newLabel("end_if");
 
     this->conditionExpr->codeGenerator(exprContext);
+
     code << exprContext.code << std::endl;
     
     if(exprContext.type == INT || exprContext.type == BOOL) {
@@ -983,8 +997,7 @@ std::string IfStmt::generateCode() {
             code << it->generateCode();
     }
 
-    code << exprContext.code << std::endl
-    << end_if_label << ": " << std::endl;
+    code << end_if_label << ": " << std::endl;
 
     Registers::releaseRegister(exprContext.registerAt);
     
@@ -1000,7 +1013,6 @@ std::string WhileStmt::generateCode() {
     std::string label2 = Label::newLabel("end_while");
 
     this->conditionExpr->codeGenerator(exprContext);
-    Registers::releaseRegister(exprContext.registerAt);
 
     code << label1 << ": " << std::endl
     << exprContext.code << std::endl;
@@ -1016,6 +1028,9 @@ std::string WhileStmt::generateCode() {
 
     code << "j " << label1 << std::endl
     << label2 << ": " << std::endl;
+
+    Registers::releaseRegister(exprContext.registerAt);
+
 
     return code.str(); 
 }
