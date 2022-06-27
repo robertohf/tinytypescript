@@ -28,7 +28,7 @@ ${TARGET}_parser.o: ${TARGET}_parser.cpp
 	mv ${TARGET}_parser.o bin
 
 ${TARGET}_parser.cpp: src/${TARGET}.y
-	bison --defines=tokens.h --debug -t -Wcounterexamples -o $@ $<	
+	bison --defines=tokens.h --debug -t -o $@ $<	
 	mv tokens.h ${TARGET}_parser.cpp build
 
 clean:

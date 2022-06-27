@@ -84,7 +84,7 @@
 [\r] { }
 [\n] { }
 [ ] { }
-. { printf("\nInvalid Lexical Character %c, Line No. %d", yytext[0], yylineno); return YYUNDEF; }
+. { printf("\nInvalid Lexical Character %c, Line No. %d", yytext[0], yylineno); }
 
 "//"[^\n]* { }
 "/*" { BEGIN(MultiLineComment); }

@@ -341,27 +341,46 @@ namespace Helper {
     };
 };
 
-class ContextStack{
-    public:
-        struct ContextStack *prev;
-        std::map<std::string, Type> variables;
-    };
+std::map<std::string, Type> variables;
 
-ContextStack * context = NULL;
+// void pushContext(){
+//     variables.clear();
+//     ContextStack *c = new ContextStack();
+//     c->variables = variables;
+//     c->prev = context;
+//     context = c;
+// }
 
-Type getLocalVariabletype(std::string id){
-    ContextStack *currContext = context;
-    while(currContext != NULL){
-        if(currContext->variables[id] != 0){
-            return currContext->variables[id];
-        }
-        currContext = currContext->prev;
-    }
-    if(!context->variables.empty()){
-        return context->variables[id];
-    }
-    return INVALID;
-}
+// ContextStack * con = NULL;
+std::stack<std::string> breakContinueLabel;
+
+// class ContextStack{
+//     public:
+//         struct ContextStack *prev;
+//         std::map<std::string, Type> variables;
+// };
+
+// void popContext(){
+//     if(context != NULL){
+//         ContextStack * previous = context->prev;
+//         free(context);
+//         context = previous;
+//     }
+// }
+
+// Type getLocalVariabletype(std::string id){
+//     ContextStack *currContext = context;
+//     while(currContext != NULL){
+//         if(currContext->variables[id] != 0){
+//             return currContext->variables[id];
+//         }
+//         currContext = currContext->prev;
+//     }
+//     if(!context->variables.empty()){
+//         return context->variables[id];
+//     }
+//     return INVALID;
+// }
 
 /**
  * @brief Expression Functions
@@ -429,20 +448,20 @@ void FloatExpr::codeGenerator(Code &context) {
 }
 
 Type IdentExpr::evalType() { 
-    Type value;
+    // Type value;
 
-    if(context != NULL){
-        value = getLocalVariabletype(this->id);
-        if(value != 0){
-            return value;
-        }
-    }
-    value = getLocalVariabletype(this->id);
-    if(value == 0){
-        std::cout<<"Error: '" << this->id << "' was not declared in this scope line: " << this->line <<std::endl;
-        exit(0);
-    }
-    return value;
+    // if(value != NULL){
+    //     value = getLocalVariabletype(this->id);
+    //     if(value != 0){
+    //         return value;
+    //     }
+    // }
+    // value = getLocalVariabletype(this->id);
+    // if(value == 0){
+    //     std::cout<<"Error: '" << this->id << "' was not declared in this scope line: " << this->line <<std::endl;
+    //     exit(0);
+    // }
+    // return value;
 }
 
 void IdentExpr::codeGenerator(Code &context) {
@@ -570,9 +589,96 @@ void MethodInvocation::codeGenerator(Code &context) {
 
 void PlusAssignExpr::codeGenerator(Code &context){
 
+    // Code leftCode;
+    // Code rightCode;
+    // Code finalResult;
+    // std::stringstream code;
+
+    // this->leftExpr->codeGenerator(leftCode);
+    // this->rightExpr->codeGenerator(rightCode);
+
+    // if(leftCode.type == INT && rightCode.type == INT){
+    //     context.type = INT;
+    //     code << "add " << finalResult.registerAt << ", " << leftCode.registerAt << ", " << rightCode.registerAt <<std::endl;
+    // }else{
+    //     context.type = FLOAT;
+    //     code << "add.s " << finalResult.registerAt << ", " << leftCode.registerAt << ", " << rightCode.registerAt <<std::endl;
+    // }
+
+    Code rightCode;
+    std::stringstream ss;
+    this->rightExpr->codeGenerator(rightCode);
+    ss << rightCode.code <<std::endl;
+    std::string name = ((IdentExpr *)this->leftExpr)->id;
+    
+    if(name != ""){
+        if(rightCode.type == INT){
+            ss << "add" << Helper::codeGenVariables[name]->offset << "($sp)" << ", " << rightCode.registerAt << ", " << Helper::codeGenVariables[name]->offset << "($sp)";
+        }else if(rightCode.type == FLOAT){
+            ss << "add.s" << Helper::codeGenVariables[name]->offset << "($sp)" << ", " << rightCode.registerAt << ", " << Helper::codeGenVariables[name]->offset << "($sp)";
+        }
+        Registers::releaseRegister(rightCode.registerAt);
+    }
+
 }
 
 void MinusAssignExpr::codeGenerator(Code &context){
+
+    Code leftCode;
+    Code rightCode;
+    Code finalResult;
+    std::stringstream code;
+
+    this->leftExpr->codeGenerator(leftCode);
+    this->rightExpr->codeGenerator(rightCode);
+
+    if(leftCode.type == INT && rightCode.type == INT){
+        context.type = INT;
+        code << "sub " << finalResult.registerAt << ", " << leftCode.registerAt << ", " << rightCode.registerAt <<std::endl;
+    }else{
+        context.type = FLOAT;
+        code << "sub.s " << finalResult.registerAt << ", " << leftCode.registerAt << ", " << rightCode.registerAt <<std::endl;
+    }
+
+}
+
+void MultAssignExpr::codeGenerator(Code &context){
+
+    Code leftCode;
+    Code rightCode;
+    Code finalResult;
+    std::stringstream code;
+
+    this->leftExpr->codeGenerator(leftCode);
+    this->rightExpr->codeGenerator(rightCode);
+
+    if(leftCode.type == INT && rightCode.type == INT){
+        context.type = INT;
+        code << "mult " << leftCode.registerAt << ", " << rightCode.registerAt <<std::endl<< "mflo " << finalResult.registerAt;
+    }else{
+        context.type = FLOAT;
+        code << "mul.s " << finalResult.registerAt << ", " << leftCode.registerAt << ", " << rightCode.registerAt;
+    }
+
+}
+
+void DivAssignExpr::codeGenerator(Code &context){
+
+    Code leftCode;
+    Code rightCode;
+    Code finalResult;
+    std::stringstream code;
+
+    this->leftExpr->codeGenerator(leftCode);
+    this->rightExpr->codeGenerator(rightCode);
+
+    if(leftCode.type == INT && rightCode.type == INT){
+        context.type = INT;
+        code << "div " << leftCode.registerAt << ", " << rightCode.registerAt <<std::endl<< "mflo " << finalResult.registerAt;
+    }else{
+        context.type = FLOAT;
+        code << "div.s " << finalResult.registerAt << ", " << leftCode.registerAt << ", " << rightCode.registerAt;
+    }
 
 }
 
@@ -719,38 +825,86 @@ ARITHMETIC_EXPR_CODE_GEN(Pwr, "^");
 UNARY_EXPR_CODE_GEN(Not, "!");
 
 Type ArrayExpr::evalType() {
-/*
-    int cont = 0;
-    Type idType = this->id->evalType();
-
-    std::list<Expr *>::iterator argsIt = this->indexExpr->begin();
-    while(argsIt != this->indexExpr.end()){
-        Expr *id = *argsIt;
-        if(id->evalType() != idType){
-            std::cout << "Error: Array " << this->id << "expression type does not match array type. Line: " << this->line <<std::endl;
-            exit(0);
-        }
-        argsIt++;
-    }
     return this->id->evalType();
-    */
 }
 
-void ArrayExpr::codeGenerator(Code &context) {}
+void ArrayExpr::codeGenerator(Code &context) {
+    Code arrayCode;
+    std::string name = this->id->id;
+    std::stringstream ss;
+    this->expr->codeGenerator(arrayCode);
+    Registers::releaseRegister(arrayCode.registerAt);
+
+    if(Helper::codeGenVariables.find(name) == Helper::codeGenVariables.end()){
+        std::string temp = Registers::Integer::getRegister();
+        std::string labelAddress = Registers::Integer::getRegister();
+        ss << arrayCode.code <<std::endl<< "li $a0, 4" <<std::endl<< "mult $a0, " << arrayCode.registerAt <<std::endl<< "mflo " << temp <<std::endl<< "la " << labelAddress << ", " << name <<std::endl<< "add " << temp << ", " << labelAddress << ", " << temp <<std::endl;
+        Registers::releaseRegister(labelAddress);
+
+        if(Helper::globalVariables[name] == INT){
+            ss << "lw " << temp << ", 0(" << temp << ")" <<std::endl;
+            context.registerAt = temp;
+        }else{
+            std::string floatTemp = Registers::Float::getRegister();
+            ss << "l.s " << floatTemp << ", 0(" << temp << ")" <<std::endl;
+            context.registerAt = floatTemp;
+        }
+
+    }else{
+        std::string temp = Registers::Integer::getRegister();
+        std::string address = Registers::Integer::getRegister();
+        ss << arrayCode.code <<std::endl<< "li $a0, 4" <<std::endl<< "mult $a0, " << arrayCode.registerAt <<std::endl<< "mflo " << temp <<std::endl;
+        
+        if(!Helper::codeGenVariables[name]->isParameter)
+            ss << "la " + address + ", " << Helper::codeGenVariables[name]->offset << "($sp)\n";
+        else
+            ss << "lw " << address << ", " << Helper::codeGenVariables[name]->offset << "($sp)" <<std::endl;
+        ss << "add " << temp << ", " << address << ", " << temp <<std::endl;
+        Registers::releaseRegister(address);
+
+        if(Helper::codeGenVariables[name]->type == INT){
+            ss << "lw " << temp << ", 0(" << temp << ")" <<std::endl;
+            context.registerAt = temp;
+            context.type = INT;
+        }else{
+            std::string floatTemp = Registers::Float::getRegister();
+            ss << "l.s " << floatTemp << ", 0(" << temp << ")" <<std::endl;
+            context.registerAt = floatTemp;
+            context.type = FLOAT;
+        }
+
+    }
+    context.code == ss.str();
+}
 
 /**
  * @brief Statement Functions
  * 
 **/
-void BlockStmt::execSemantics() {}
+void BlockStmt::execSemantics() {
+    std::list<Stmt *>::iterator statementIt = this->stmtList->begin();
+
+    while(statementIt != this->stmtList->end()){
+        if((*statementIt) != NULL)
+            (*statementIt)->execSemantics();
+        statementIt++;
+    }
+}
 
 std::string BlockStmt::generateCode() { 
     std::stringstream code;
 
-    for(auto it : *stmtList)
-        code << it->generateCode();
+    std::list<Stmt *>::iterator its = this->stmtList->begin();
 
-    return code.str(); 
+    while(its != this->stmtList->end()){
+        Stmt *stmt = *its;
+
+        if(stmt != NULL)
+            code << stmt->generateCode() <<std::endl;
+        its++;
+
+    }
+    return code.str();
 }
 
 void AssignStmt::execSemantics() {}
@@ -781,7 +935,9 @@ std::string AssignStmt::generateCode() {
     return code.str(); 
 }
 
-void ReturnStmt::execSemantics() {}
+void ReturnStmt::execSemantics() {
+    this->expr->evalType();
+}
 
 std::string ReturnStmt::generateCode() { 
     Code exprContext;
@@ -805,15 +961,23 @@ void BreakStmt::execSemantics() {}
 std::string BreakStmt::generateCode() { 
     std::stringstream code;
 
-    code << "j " << std::endl;
-    return code.str(); 
+    code << "j " << breakContinueLabel.top() <<std::endl;
+    breakContinueLabel.pop();
+    return code.str();
 }
 
 void ContinueStmt::execSemantics() {}
 
-std::string ContinueStmt::generateCode() { return ""; }
+std::string ContinueStmt::generateCode() {
+    std::stringstream ss;
+    ss << "j " << breakContinueLabel.top() <<std::endl;
+    breakContinueLabel.pop();
+    return ss.str();
+}
 
-void PrintStmt::execSemantics() {}
+void PrintStmt::execSemantics() {
+    this->expr->evalType();
+}
 
 std::string PrintStmt::generateCode() {
     std::stringstream code;
@@ -972,7 +1136,15 @@ std::string Declaration::generateCode() {
     return code.str();
 }
 
-void IfStmt::execSemantics() {}
+void IfStmt::execSemantics() {
+    if(this->conditionExpr->evalType() != BOOL){
+        std::cout << "Expression for if must be boolean\n";
+        exit(0);
+    }
+    // pushContext();
+    // this->tStatement->execSemantics();
+    // popContext();
+}
 
 std::string IfStmt::generateCode() { 
     Code exprContext;

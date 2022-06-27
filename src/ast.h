@@ -163,15 +163,18 @@ BINARY_EXPR(And);
 BINARY_EXPR(Or);
 BINARY_EXPR(PlusAssign);
 BINARY_EXPR(MinusAssign);
+BINARY_EXPR(MultAssign);
+BINARY_EXPR(DivAssign);
+BINARY_EXPR(ModAssign);
 UNARY_EXPR(Not);
 
 class ArrayExpr : public Expr {
 public:
-    ArrayExpr(IdentExpr *id, ArgumentList *indexExpr) 
-    : id(id), indexExpr(indexExpr) {}
+    ArrayExpr(IdentExpr *id, ExprPtr expr) 
+    : id(id), expr(expr) {}
     
     IdentExpr *id;
-    ArgumentList *indexExpr;
+    ExprPtr expr;
     
     Type evalType() override;
     void codeGenerator(Code &context) override;

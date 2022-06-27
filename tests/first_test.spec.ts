@@ -17,7 +17,7 @@
 //     x = x + 1;
 // }
 
-var addFunc = (num1: number, num2: number): number => {
+function addFunc(num1: number, num2: number): number {
     return num1 + num2;
 };
 
@@ -62,12 +62,16 @@ function main () : void {
 
     let w : number;
 
-    x = 20;
-    y = 25;
+    x = 10;
+    y = 5;
+    z = 2;
 
-    if(x < y) {
-        z = x + y;
-    }
+    // if(x < y) {
+    //     z -= y;
+    // }
+    // console.log(z);
+    z += y;
+
 
     console.log(z);
 };

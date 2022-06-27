@@ -106,7 +106,6 @@ DeclarationSourceFile: BlockStatement {
 BlockStatement: Statement { $$ = new StmtList; $$->push_back($1); }
         |  BlockStatement Statement { $$ = $1; $$->push_back($2); }
 ;
-
 Statement: ImportDeclaration SemiColon { $$ = $1; }
         | LogStatement SemiColon { $$ = $1; }
         | DeclarationStatement SemiColon { $$ = $1; }
@@ -274,7 +273,7 @@ UnaryExpression: '!' UnaryExpression { $$ = new NotExpr($2); }
         | PostfixExpression { $$ = $1; }
 ;
 
-PostfixExpression: PostfixExpression '[' ArgumentExpressionList ']' { $$ = new ArrayExpr((IdentExpr *)$1, $3); }
+PostfixExpression: PostfixExpression '[' Expression ']' { $$ = new ArrayExpr((IdentExpr *)$1, $3); }
         | PostfixExpression '(' ')' { $$ = new MethodInvocation((IdentExpr *)$1, new ArgumentList); }
         | PostfixExpression '(' ArgumentExpressionList ')' { $$ = new MethodInvocation((IdentExpr *)$1, $3); }
         | PrimaryExpression { $$ = $1; }
