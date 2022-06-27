@@ -193,10 +193,10 @@ public:
 class BlockStmt : public Stmt {
 public:
     BlockStmt(StmtList *stmtList) 
-    : stmtList(stmtList) { }
+    : stmtList(stmtList) {}
     
     StmtList *stmtList;
-    
+
     void execSemantics() override;
     std::string generateCode() override;
 };
